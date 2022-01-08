@@ -1,0 +1,48 @@
+use std::fs::{read_to_string, write};
+use std::path::PathBuf;
+use toml::{to_string, from_str};
+use serde_derive::{Deserialize, Serialize};
+use std::collections::HashMap;
+use log::warn;
+
+#[derive(Serialize, Deserialize)]
+pub struct Config {
+    pub prefix: String,
+    pub commands: HashMap<String, String>,
+}
+
+impl Config {
+    pub fn create() -> String {
+
+        let path = PathBuf::from("./config.toml");
+        let mut config = Self { 
+            prefix: String::new(),
+            commands: HashMap::new(),
+        };
+        
+        config.prefix = "!".to_string();
+        config.commands.insert("ping".to_string(), "Pong!".to_string());
+        config.commands.insert("pong".to_string(), "Pong!".to_string());
+
+        let out = to_string(&config).expect("Failed to convert to TOML format");
+        write(path, &out).expect("Failed to write config.toml");
+        out
+    }
+
+    pub fn get() -> Self {
+        let path = PathBuf::from("./config.toml");
+        let mut file = "".to_string();
+        
+        match read_to_string(path) {
+            Ok(f) => {
+                file = f;
+            },
+            Err(e) => {
+                warn!("Error reading config file: {}", e);
+                file = Config::create();
+            },
+        }
+
+        from_str(&file).expect("Failed to parse TOML")
+    }
+}
