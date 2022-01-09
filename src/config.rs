@@ -9,6 +9,8 @@ use std::collections::HashMap;
 pub struct Config {
     pub bot_token: String,
     pub prefix: String,
+    pub response_cooldown: u64,
+    pub regex_response_cooldown: u64,
     pub responses: HashMap<String, String>,
     pub regex_responses: HashMap<String, String>,
 }
@@ -25,12 +27,16 @@ impl Config {
         let mut config = Self { 
             bot_token: String::new(),
             prefix: String::new(),
+            response_cooldown: 0,
+            regex_response_cooldown: 0,
             responses: HashMap::new(),
             regex_responses: HashMap::new(),
         };
         
         config.bot_token = "XXXXXX".to_string();
         config.prefix = "!".to_string();
+        config.response_cooldown = 15;
+        config.regex_response_cooldown = 45;
         config.responses.insert("ping".to_string(), "Pong!".to_string());
         config.responses.insert("pong".to_string(), "Pong!".to_string());
         config.regex_responses.insert("is the bot (?:here|on|alive|working)".to_string(), "Nope, definitely not".to_string());
