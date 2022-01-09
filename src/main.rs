@@ -21,11 +21,13 @@ use config::CONFIG;
 #[group]
 struct General;
 
+// Define hashmaps for cooldowns
 struct Handler {
     response_cooldowns: Arc<RwLock<HashMap<String, Instant>>>,
     regex_cooldowns: Arc<RwLock<HashMap<String, Instant>>>,
 }
 
+// Create hashmaps on the handler
 impl Handler {
     pub fn new() -> Handler {
         Handler {
@@ -35,13 +37,18 @@ impl Handler {
     }
 }
 
+// Implements functions for events
 #[async_trait]
 impl EventHandler for Handler {
+    // Run on message
     async fn message(&self, ctx: Context, msg: Message) {
+        // Check if the message starts with the prefix
         if msg.content.starts_with(&CONFIG.prefix) {
+            // Check if the first word proceding the prefix is a defined canned response
             let command = msg.content.strip_prefix(&CONFIG.prefix).unwrap_or_default().split(' ').take(1).next().unwrap_or_default();
             match &CONFIG.responses.get(command) {
                 Some(v) => {
+                    // Check if the command is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply
                     if !self.response_cooldowns.read().unwrap().contains_key(command) || 
                     self.response_cooldowns.read().unwrap().get(command).unwrap().elapsed().as_secs() > CONFIG.response_cooldown {
                         if let Err(why) = msg.reply(&ctx, &v).await {
@@ -53,8 +60,10 @@ impl EventHandler for Handler {
                 None => (),
             }    
         } else {
+            // Check if the message matches a defined regex
             for (regex, response) in &CONFIG.regex_responses {
                 if Regex::new(regex).unwrap().is_match(&msg.content) {
+                    // Check if the regex is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply
                     if !self.regex_cooldowns.read().unwrap().contains_key(regex) ||
                     self.regex_cooldowns.read().unwrap().get(regex).unwrap().elapsed().as_secs() > CONFIG.regex_response_cooldown {
                         if let Err(why) = msg.reply(&ctx, response).await {
