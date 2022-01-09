@@ -6,6 +6,8 @@ use serenity::framework::standard::{
     macros::group,
 };
 
+use regex::Regex;
+
 #[macro_use]
 extern crate lazy_static;
 
@@ -34,7 +36,15 @@ impl EventHandler for Handler {
                     None => println!("ERROR: Could not send message."),
                 }    
             }    
-        }
+        } else {
+            for (regex, response) in &CONFIG.regex_responses {
+                if Regex::new(regex).unwrap().is_match(&msg.content) {
+                    if let Err(why) = msg.reply(&ctx, response).await {
+                        println!("Error sending message: {:?}", why);
+                    }
+                }
+            }
+        } 
     }
 }
 

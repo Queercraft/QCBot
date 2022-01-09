@@ -10,6 +10,7 @@ pub struct Config {
     pub bot_token: String,
     pub prefix: String,
     pub responses: HashMap<String, String>,
+    pub regex_responses: HashMap<String, String>,
 }
 
 lazy_static! {
@@ -25,13 +26,15 @@ impl Config {
             bot_token: String::new(),
             prefix: String::new(),
             responses: HashMap::new(),
+            regex_responses: HashMap::new(),
         };
         
         config.bot_token = "XXXXXX".to_string();
         config.prefix = "!".to_string();
         config.responses.insert("ping".to_string(), "Pong!".to_string());
         config.responses.insert("pong".to_string(), "Pong!".to_string());
-
+        config.regex_responses.insert("is the bot (?:here|on|alive|working)".to_string(), "Nope, definitely not".to_string());
+        
         let out = to_string(&config).expect("Failed to convert to TOML format");
         write(path, &out).expect("Failed to write config.toml");
         out
