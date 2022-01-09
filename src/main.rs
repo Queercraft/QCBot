@@ -9,9 +9,13 @@ use log::warn;
 
 use std::env;
 
+#[macro_use]
+extern crate lazy_static;
+
 mod config;
 
-use config::Config;
+use config::CONFIG;
+
 
 #[group]
 struct General;
@@ -21,11 +25,10 @@ struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
-        let config = Config::get();
-        if msg.content.starts_with(&config.prefix) {
-            let command = msg.content.strip_prefix(&config.prefix).unwrap_or_default().split(' ').take(1).next().unwrap_or_default();
-            if config.commands.contains_key(command) {
-                match &config.commands.get(command) {
+        if msg.content.starts_with(&CONFIG.prefix) {
+            let command = msg.content.strip_prefix(&CONFIG.prefix).unwrap_or_default().split(' ').take(1).next().unwrap_or_default();
+            if CONFIG.commands.contains_key(command) {
+                match &CONFIG.commands.get(command) {
                     Some(v) => {
                         if let Err(why) = msg.reply(&ctx, &v).await {
                             warn!("Error sending message: {:?}", why);

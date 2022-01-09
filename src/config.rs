@@ -5,10 +5,16 @@ use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 use log::warn;
 
+
 #[derive(Serialize, Deserialize)]
 pub struct Config {
     pub prefix: String,
     pub commands: HashMap<String, String>,
+}
+
+lazy_static! {
+    pub static ref CONFIG: Config = Config::get();
+
 }
 
 impl Config {
