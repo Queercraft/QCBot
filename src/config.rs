@@ -34,7 +34,7 @@ impl Config {
         config.responses.insert("ping".to_string(), "Pong!".to_string());
         config.responses.insert("pong".to_string(), "Pong!".to_string());
         config.regex_responses.insert("is the bot (?:here|on|alive|working)".to_string(), "Nope, definitely not".to_string());
-        
+
         let out = to_string(&config).expect("Failed to convert to TOML format");
         write(path, &out).expect("Failed to write config.toml");
         out
@@ -42,17 +42,16 @@ impl Config {
 
     pub fn get() -> Self {
         let path = PathBuf::from("./config.toml");
-        let mut file = String::new();
-        
-        match read_to_string(path) {
+      
+        let file = match read_to_string(path) {
             Ok(f) => {
-                file = f;
+                f
             },
             Err(e) => {
                 println!("{}\nNo config file found! Creating a new file, please configure it with your bot token", e);
-                file = Config::create();
+                Config::create()
             },
-        }
+        };
 
         from_str(&file).expect("Failed to parse TOML")
     }
