@@ -5,7 +5,6 @@ use serenity::framework::standard::{
     StandardFramework,
     macros::group,
 };
-use log::warn;
 
 #[macro_use]
 extern crate lazy_static;
@@ -29,10 +28,10 @@ impl EventHandler for Handler {
                 match &CONFIG.commands.get(command) {
                     Some(v) => {
                         if let Err(why) = msg.reply(&ctx, &v).await {
-                            warn!("Error sending message: {:?}", why);
+                            println!("Error sending message: {:?}", why);
                         }
                     }
-                    None => warn!("ERROR: Could not send message."),
+                    None => println!("ERROR: Could not send message."),
                 }    
             }    
         }
@@ -45,7 +44,7 @@ async fn main() {
     let framework = StandardFramework::new()
         .group(&GENERAL_GROUP);
 
-    // Login with a bot token from the environment
+    // Login with a bot token from the config file
     let mut client = Client::builder(&CONFIG.bot_token)
         .event_handler(Handler)
         .framework(framework)
@@ -54,6 +53,6 @@ async fn main() {
 
     // start listening for events by starting a single shard
     if let Err(why) = client.start().await {
-        warn!("An error occurred while running the client: {:?}", why);
+        println!("{}\nAn error occurred while running the client... exiting", why);
     }
 }
