@@ -9,7 +9,7 @@ use std::collections::HashMap;
 pub struct Config {
     pub bot_token: String,
     pub prefix: String,
-    pub commands: HashMap<String, String>,
+    pub responses: HashMap<String, String>,
 }
 
 lazy_static! {
@@ -24,13 +24,13 @@ impl Config {
         let mut config = Self { 
             bot_token: String::new(),
             prefix: String::new(),
-            commands: HashMap::new(),
+            responses: HashMap::new(),
         };
         
         config.bot_token = "XXXXXX".to_string();
         config.prefix = "!".to_string();
-        config.commands.insert("ping".to_string(), "Pong!".to_string());
-        config.commands.insert("pong".to_string(), "Pong!".to_string());
+        config.responses.insert("ping".to_string(), "Pong!".to_string());
+        config.responses.insert("pong".to_string(), "Pong!".to_string());
 
         let out = to_string(&config).expect("Failed to convert to TOML format");
         write(path, &out).expect("Failed to write config.toml");
