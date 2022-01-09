@@ -44,8 +44,18 @@ impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         // Check if the message starts with the prefix
         if msg.content.starts_with(&CONFIG.prefix) {
-            // Check if the first word proceding the prefix is a defined canned response
-            let command = msg.content.strip_prefix(&CONFIG.prefix).unwrap_or_default().split(' ').take(1).next().unwrap_or_default();
+            // Get the word after the prefix
+            let mut command = msg.content.strip_prefix(&CONFIG.prefix).unwrap_or_default().split(' ').take(1).next().unwrap_or_default();
+            // Check if the command is set as an alias everywhere
+            // If so, redefine the command to what the alias is for
+            for (cmd, aliases) in &CONFIG.reponses_aliases {
+                for a in aliases {
+                    if &command == a {
+                        command = cmd
+                    }
+                }
+            }
+            // Check if the command is a canned response
             match &CONFIG.responses.get(command) {
                 Some(v) => {
                     // Check if the command is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply

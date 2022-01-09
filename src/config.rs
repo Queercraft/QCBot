@@ -13,6 +13,7 @@ pub struct Config {
     pub response_cooldown: u64,
     pub regex_response_cooldown: u64,
     pub responses: HashMap<String, String>,
+    pub reponses_aliases: HashMap<String, Vec<String>>,
     pub regex_responses: HashMap<String, String>,
 }
 
@@ -27,6 +28,9 @@ impl Default for Config {
             responses: HashMap::from([
                 ("ping".to_string(), "Pong!".to_string()),
                 ("pong".to_string(), "Ping!".to_string()),
+            ]),
+            reponses_aliases: HashMap::from([
+                ("ping".to_string(), Vec::from(["p".to_string(), "test".to_string()])),
             ]),
             regex_responses: HashMap::from([
                 ("is the bot (?:here|on|alive|working)".to_string(), "Nope, definitely not".to_string()),
