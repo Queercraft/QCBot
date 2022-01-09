@@ -8,6 +8,7 @@ use log::warn;
 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
+    pub bot_token: String,
     pub prefix: String,
     pub commands: HashMap<String, String>,
 }
@@ -22,10 +23,12 @@ impl Config {
 
         let path = PathBuf::from("./config.toml");
         let mut config = Self { 
+            bot_token: String::new(),
             prefix: String::new(),
             commands: HashMap::new(),
         };
         
+        config.bot_token = "XXXXXX".to_string();
         config.prefix = "!".to_string();
         config.commands.insert("ping".to_string(), "Pong!".to_string());
         config.commands.insert("pong".to_string(), "Pong!".to_string());

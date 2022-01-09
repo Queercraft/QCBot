@@ -1,5 +1,0 @@
-prefix = "!"
-
-[commands]
-pong = "Pong!"
-ping = "Pong!"

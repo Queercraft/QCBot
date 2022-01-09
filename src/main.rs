@@ -7,8 +7,6 @@ use serenity::framework::standard::{
 };
 use log::warn;
 
-use std::env;
-
 #[macro_use]
 extern crate lazy_static;
 
@@ -48,8 +46,7 @@ async fn main() {
         .group(&GENERAL_GROUP);
 
     // Login with a bot token from the environment
-    let token = env::var("DISCORD_TOKEN").expect("token");
-    let mut client = Client::builder(token)
+    let mut client = Client::builder(&CONFIG.bot_token)
         .event_handler(Handler)
         .framework(framework)
         .await
