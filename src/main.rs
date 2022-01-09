@@ -6,13 +6,13 @@ use serenity::framework::standard::{
     macros::group,
 };
 use regex::Regex;
-
 use std::sync::{Arc, RwLock};
 use std::collections::HashMap;
 use std::time::Instant;
 
 #[macro_use]
 extern crate lazy_static;
+extern crate serde;
 
 mod config;
 
