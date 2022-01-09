@@ -50,7 +50,7 @@ impl EventHandler for Handler {
             // If so, redefine the command to what the alias is for
             for (cmd, aliases) in &CONFIG.reponses_aliases {
                 for a in aliases {
-                    if &command == a {
+                    if command == a {
                         command = cmd
                     }
                 }
