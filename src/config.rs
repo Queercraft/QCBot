@@ -10,6 +10,7 @@ use lazy_static::lazy_static;
 #[serde(default)]
 pub struct Role {
     pub id: u64,
+    pub webhook_regex: String,
     pub inherit: String,
     pub bypass_regex: bool,
     pub bypass_response_cooldown: bool,
@@ -21,6 +22,7 @@ impl Default for Role {
     fn default() -> Self {
         Self {
             id: 0,
+            webhook_regex: "".to_string(),
             inherit: "".to_string(),
             bypass_regex: false,
             bypass_response_cooldown: false,
@@ -48,6 +50,7 @@ impl Default for Config {
     fn default() -> Self {
         let admin = Role {
             id: 123456781234567812,
+            webhook_regex: "\\[Admin\\].*".to_string(),
             inherit: "default".to_string(),
             bypass_regex: true,
             bypass_response_cooldown: true,

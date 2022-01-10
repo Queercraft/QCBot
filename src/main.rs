@@ -53,15 +53,27 @@ impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         // Get users permission group
         let mut r = String::new(); 
-        if let Some(member) = &msg.member {
-            for memberrole in &member.roles {
-                if let Some((name, _role)) = CONFIG.roles.iter().find(|(_name, role)|
-                &role.id == memberrole.as_u64()) {
-                        r = name.to_string();
-                        break;
+        // If the message is not from a webhook
+        if msg.webhook_id.is_none() {
+            if let Some(member) = &msg.member {
+                for memberrole in &member.roles {
+                    if let Some((name, _role)) = CONFIG.roles.iter().find(|(_name, role)|
+                    &role.id == memberrole.as_u64()) {
+                            r = name.to_string();
+                            break;
+                    }
                 }
             }
-        }
+        // If the message is from a webhook
+        } else {    
+            for (name, role) in &CONFIG.roles {
+                if !role.webhook_regex.is_empty() &&  Regex::new(&role.webhook_regex).unwrap().is_match(&msg.author.name) {
+                    r = name.to_string();
+                    break;
+                }
+            }
+            
+         };
 
         // Fall back to default role
         if r == "" {
