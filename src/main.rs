@@ -10,10 +10,6 @@ use std::sync::{Arc, RwLock};
 use std::collections::HashMap;
 use std::time::Instant;
 
-#[macro_use]
-extern crate lazy_static;
-extern crate serde;
-
 mod config;
 
 use config::CONFIG;
@@ -43,20 +39,22 @@ impl EventHandler for Handler {
     // Run on message
     async fn message(&self, ctx: Context, msg: Message) {
         // Get users permission group
-        let mut role = String::new(); 
+        let mut r = String::new(); 
         if let Some(member) = &msg.member {
-            for memberrole in &member.roles {
-                for (n, r) in &CONFIG.roles {
-                    if &r.id == memberrole.as_u64() {
-                        role = n.to_string();
+            'outer: for memberrole in &member.roles {
+                for (name, role) in &CONFIG.roles {
+                    if &role.id == memberrole.as_u64() {
+                        r = name.to_string();
+                        break 'outer;
                     }
                 }
             }
         }
         // Fall back to default role
-        if role == "" {
-            role = "default".to_string();
+        if r == "" {
+            r = "default".to_string();
         }
+        let role = &CONFIG.roles.get(&r).unwrap(); 
 
         // Check if the message starts with the prefix
         if msg.content.starts_with(&CONFIG.prefix) {
@@ -87,16 +85,18 @@ impl EventHandler for Handler {
                 None => (),
             }    
         } else {
-            // Check if the message matches a defined regex
-            for (regex, response) in &CONFIG.regex_responses {
-                if Regex::new(regex).unwrap().is_match(&msg.content) {
-                    // Check if the regex is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply
-                    if !self.regex_cooldowns.read().unwrap().contains_key(regex) ||
-                    self.regex_cooldowns.read().unwrap().get(regex).unwrap().elapsed().as_secs() > CONFIG.regex_response_cooldown {
-                        if let Err(why) = msg.reply(&ctx, response).await {
-                            println!("Error sending message: {:?}", why);
+            if role.bypass_regex == false {
+                // Check if the message matches a defined regex
+                for (regex, response) in &CONFIG.regex_responses {
+                    if Regex::new(regex).unwrap().is_match(&msg.content) {
+                        // Check if the regex is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply
+                        if !self.regex_cooldowns.read().unwrap().contains_key(regex) ||
+                        self.regex_cooldowns.read().unwrap().get(regex).unwrap().elapsed().as_secs() > CONFIG.regex_response_cooldown {
+                            if let Err(why) = msg.reply(&ctx, response).await {
+                                println!("Error sending message: {:?}", why);
+                            }
+                            self.regex_cooldowns.write().unwrap().insert(regex.to_string(), Instant::now());
                         }
-                        self.regex_cooldowns.write().unwrap().insert(regex.to_string(), Instant::now());
                     }
                 }
             }
