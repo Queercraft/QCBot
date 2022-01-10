@@ -12,6 +12,7 @@ use std::time::Instant;
 
 mod config;
 
+use config::Role;
 use config::CONFIG;
 
 #[group]
@@ -29,6 +30,18 @@ impl Handler {
         Handler {
             response_cooldowns: Arc::new(RwLock::new(HashMap::new())),
             regex_cooldowns: Arc::new(RwLock::new(HashMap::new()))
+        }
+    }
+}
+
+fn check_permission(command: String, role: &Role) -> bool {
+    if role.perms.contains(&command) {
+        return true;
+    } else {
+        if !role.inherit.is_empty() {
+            return check_permission(command, CONFIG.roles.get(&role.inherit).unwrap());
+        } else {
+            return false;
         }
     }
 }
@@ -69,17 +82,18 @@ impl EventHandler for Handler {
                     }
                 }
             }
-
             // Check if the command is a canned response
             match &CONFIG.responses.get(command) {
                 Some(v) => {
                     // Check if the command is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply
-                    if role.bypass_response_cooldown == true || !self.response_cooldowns.read().unwrap().contains_key(command) || 
-                    self.response_cooldowns.read().unwrap().get(command).unwrap().elapsed().as_secs() > CONFIG.response_cooldown {
-                        if let Err(why) = msg.reply(&ctx, &v).await {
-                            println!("Error sending message: {:?}", why);
-                        }    
-                        self.response_cooldowns.write().unwrap().insert(command.to_string(), Instant::now());
+                    if check_permission(command.to_string(), role) {
+                        if role.bypass_response_cooldown == true || !self.response_cooldowns.read().unwrap().contains_key(command) || 
+                        self.response_cooldowns.read().unwrap().get(command).unwrap().elapsed().as_secs() > CONFIG.response_cooldown {
+                            if let Err(why) = msg.reply(&ctx, &v).await {
+                                println!("Error sending() message: {:?}", why);
+                            }    
+                            self.response_cooldowns.write().unwrap().insert(command.to_string(), Instant::now());
+                        }
                     }
                 }
                 None => (),
