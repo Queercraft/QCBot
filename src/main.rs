@@ -90,10 +90,14 @@ impl EventHandler for Handler {
                         if role.bypass_response_cooldown == true || !self.response_cooldowns.read().unwrap().contains_key(command) || 
                         self.response_cooldowns.read().unwrap().get(command).unwrap().elapsed().as_secs() > CONFIG.response_cooldown {
                             if let Err(why) = msg.reply(&ctx, &v).await {
-                                println!("Error sending() message: {:?}", why);
+                                println!("Error sending message: {:?}", why);
                             }    
                             self.response_cooldowns.write().unwrap().insert(command.to_string(), Instant::now());
                         }
+                    } else {
+                        if let Err(why) = msg.react(ctx, '❌').await {
+                            println!("Error reacting to message: {:?}", why);
+                        };
                     }
                 }
                 None => (),
