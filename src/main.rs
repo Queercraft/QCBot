@@ -41,15 +41,15 @@ impl EventHandler for Handler {
         // Get users permission group
         let mut r = String::new(); 
         if let Some(member) = &msg.member {
-            'outer: for memberrole in &member.roles {
-                for (name, role) in &CONFIG.roles {
-                    if &role.id == memberrole.as_u64() {
+            for memberrole in &member.roles {
+                if let Some((name, _role)) = CONFIG.roles.iter().find(|(_name, role)|
+                &role.id == memberrole.as_u64()) {
                         r = name.to_string();
-                        break 'outer;
-                    }
+                        break;
                 }
             }
         }
+
         // Fall back to default role
         if r == "" {
             r = "default".to_string();
