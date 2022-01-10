@@ -48,7 +48,7 @@ impl Default for Config {
     fn default() -> Self {
         let admin = Role {
             id: 123456781234567812,
-            inherit: "mod".to_string(),
+            inherit: "default".to_string(),
             bypass_regex: true,
             bypass_response_cooldown: true,
             perms: Vec::from(["pong".to_string()]),
