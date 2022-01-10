@@ -74,7 +74,7 @@ impl EventHandler for Handler {
             match &CONFIG.responses.get(command) {
                 Some(v) => {
                     // Check if the command is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply
-                    if !self.response_cooldowns.read().unwrap().contains_key(command) || 
+                    if role.bypass_response_cooldown == true || !self.response_cooldowns.read().unwrap().contains_key(command) || 
                     self.response_cooldowns.read().unwrap().get(command).unwrap().elapsed().as_secs() > CONFIG.response_cooldown {
                         if let Err(why) = msg.reply(&ctx, &v).await {
                             println!("Error sending message: {:?}", why);
