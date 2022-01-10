@@ -4,6 +4,29 @@ use toml::{to_string, from_str};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+#[derive(Serialize, Deserialize)]
+#[serde(default)]
+pub struct Role {
+    pub id: u64,
+    pub inherit: String,
+    pub bypass_regex: bool,
+    pub bypass_response_cooldown: bool,
+    pub perms: Vec<String>,
+}
+
+impl Default for Role {
+    // Create default function called by serde if valuies are missing from config
+    fn default() -> Self {
+        Self {
+            id: 0,
+            inherit: "".to_string(),
+            bypass_regex: false,
+            bypass_response_cooldown: false,
+            perms: Vec::from(["ping".to_string()]),
+        }
+    }
+}
+
 // Struct of all the config options
 #[derive(Serialize, Deserialize)]
 #[serde(default)]
@@ -15,11 +38,19 @@ pub struct Config {
     pub responses: HashMap<String, String>,
     pub reponses_aliases: HashMap<String, Vec<String>>,
     pub regex_responses: HashMap<String, String>,
+    pub roles: HashMap<String, Role>,
 }
 
 impl Default for Config {
     // Create default function called by serde if values are missing from config
     fn default() -> Self {
+        let admin = Role {
+            id: 123456781234567812,
+            inherit: "mod".to_string(),
+            bypass_regex: true,
+            bypass_response_cooldown: true,
+            perms: Vec::from(["pong".to_string()]),
+        };
         Self {
             bot_token: "XXXXXX".to_string(),
             prefix: "!".to_string(),
@@ -35,6 +66,10 @@ impl Default for Config {
             regex_responses: HashMap::from([
                 ("is the bot (?:here|on|alive|working)".to_string(), "Nope, definitely not".to_string()),
             ]),
+            roles: HashMap::from([
+                ("default".to_string(), Role::default()),
+                ("admin".to_string(), admin),
+            ])
         }
     }
 }

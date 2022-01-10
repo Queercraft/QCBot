@@ -42,6 +42,22 @@ impl Handler {
 impl EventHandler for Handler {
     // Run on message
     async fn message(&self, ctx: Context, msg: Message) {
+        // Get users permission group
+        let mut role = String::new(); 
+        if let Some(member) = &msg.member {
+            for memberrole in &member.roles {
+                for (n, r) in &CONFIG.roles {
+                    if &r.id == memberrole.as_u64() {
+                        role = n.to_string();
+                    }
+                }
+            }
+        }
+        // Fall back to default role
+        if role == "" {
+            role = "default".to_string();
+        }
+
         // Check if the message starts with the prefix
         if msg.content.starts_with(&CONFIG.prefix) {
             // Get the word after the prefix
@@ -55,6 +71,7 @@ impl EventHandler for Handler {
                     }
                 }
             }
+
             // Check if the command is a canned response
             match &CONFIG.responses.get(command) {
                 Some(v) => {
