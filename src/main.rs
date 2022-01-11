@@ -15,6 +15,10 @@ mod config;
 use config::Role;
 use config::CONFIG;
 
+mod commands;
+
+use commands::commands;
+
 #[group]
 struct General;
 
@@ -81,10 +85,13 @@ impl EventHandler for Handler {
         }
         let role = &CONFIG.roles.get(&r).unwrap(); 
 
+        let content = Regex::new(&CONFIG.trim_regex).unwrap().replace_all(&msg.content, "");
+
         // Check if the message starts with the prefix
-        if msg.content.starts_with(&CONFIG.prefix) {
+        if content.starts_with(&CONFIG.prefix) {
             // Get the word after the prefix
-            let mut command = msg.content.strip_prefix(&CONFIG.prefix).unwrap_or_default().split(' ').take(1).next().unwrap_or_default();
+            let mut command = content.strip_prefix(&CONFIG.prefix).unwrap_or_default().split(' ').take(1).next().unwrap_or_default();
+
             // Check if the command is set as an alias everywhere
             // If so, redefine the command to what the alias is for
             for (cmd, aliases) in &CONFIG.reponses_aliases {
@@ -94,31 +101,59 @@ impl EventHandler for Handler {
                     }
                 }
             }
+
+            let mut output = String::new();
+            
+            if role.bypass_response_cooldown == true || !self.response_cooldowns.read().unwrap().contains_key(command) || 
+            self.response_cooldowns.read().unwrap().get(command).unwrap().elapsed().as_secs() > CONFIG.response_cooldown { 
+
             // Check if the command is a canned response
-            match &CONFIG.responses.get(command) {
-                Some(v) => {
-                    // Check if the command is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply
-                    if check_permission(command.to_string(), role) {
-                        if role.bypass_response_cooldown == true || !self.response_cooldowns.read().unwrap().contains_key(command) || 
-                        self.response_cooldowns.read().unwrap().get(command).unwrap().elapsed().as_secs() > CONFIG.response_cooldown {
-                            if let Err(why) = msg.reply(&ctx, &v).await {
-                                println!("Error sending message: {:?}", why);
-                            }    
-                            self.response_cooldowns.write().unwrap().insert(command.to_string(), Instant::now());
+                match &CONFIG.responses.get(command) {
+                    Some(v) => {
+                        // Check if the command is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply
+                        if check_permission(command.to_string(), role) {
+                            output = v.to_string();
+                        } else {
+                            if let Err(why) = msg.react(&ctx, '❌').await {
+                                println!("Error reacting to message: {:?}", why);
+                            };
                         }
-                    } else {
-                        if let Err(why) = msg.react(ctx, '❌').await {
-                            println!("Error reacting to message: {:?}", why);
-                        };
+                    }
+                    None => {
+                        // Send to command executor
+                        if CONFIG.enabled_utils.contains(&command.to_string()) {
+                            if check_permission(command.to_string(), role) {
+                                output = commands(command.to_string(), 
+                                content.strip_prefix(&format!("{}{}", CONFIG.prefix, &command)
+                                .to_string()).unwrap_or_default().split(' ').take(1).next().unwrap_or_default().to_string());    
+                            } else {
+                                if let Err(why) = msg.react(&ctx, '❌').await {
+                                    println!("Error reacting to message: {:?}", why);
+                                };
+                            }
+                        }
                     }
                 }
-                None => (),
-            }    
+
+                if !output.is_empty() {
+                    self.response_cooldowns.write().unwrap().insert(command.to_string(), Instant::now());
+                    if let Err(why) = msg.reply(&ctx, output).await {
+                        println!("Error sending message: {:?}", why);
+                    }
+                }
+
+            } else {
+                if let Err(why) = msg.react(&ctx, '⏳').await {
+                    println!("Error reacting to message: {:?}", why);
+                };
+            }
+
+                
         } else {
             if role.bypass_regex == false {
                 // Check if the message matches a defined regex
                 for (regex, response) in &CONFIG.regex_responses {
-                    if Regex::new(regex).unwrap().is_match(&msg.content) {
+                    if Regex::new(regex).unwrap().is_match(&content) {
                         // Check if the regex is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply
                         if !self.regex_cooldowns.read().unwrap().contains_key(regex) ||
                         self.regex_cooldowns.read().unwrap().get(regex).unwrap().elapsed().as_secs() > CONFIG.regex_response_cooldown {

@@ -37,8 +37,10 @@ impl Default for Role {
 pub struct Config {
     pub bot_token: String,
     pub prefix: String,
+    pub trim_regex: String,
     pub response_cooldown: u64,
     pub regex_response_cooldown: u64,
+    pub enabled_utils: Vec<String>,
     pub responses: HashMap<String, String>,
     pub reponses_aliases: HashMap<String, Vec<String>>,
     pub regex_responses: HashMap<String, String>,
@@ -59,8 +61,12 @@ impl Default for Config {
         Self {
             bot_token: "XXXXXX".to_string(),
             prefix: "!".to_string(),
+            trim_regex: "".to_string(),
             response_cooldown: 15,
             regex_response_cooldown: 45,
+            enabled_utils: Vec::from([
+                "temp".to_string()
+            ]),
             responses: HashMap::from([
                 ("ping".to_string(), "Pong!".to_string()),
                 ("pong".to_string(), "Ping!".to_string()),
