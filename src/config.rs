@@ -27,10 +27,11 @@ impl Default for Role {
             bypass_regex: false,
             bypass_response_cooldown: false,
             perms: Vec::from([
-                "ping".to_string(),
+                "8ball".to_string(),
                 "temp".to_string(),
                 "mcstacks".to_string(),
                 "mcitems".to_string(),
+                "ping".to_string(),
                 ]),
         }
     }
@@ -71,6 +72,7 @@ impl Default for Config {
             response_cooldown: 15,
             regex_response_cooldown: 45,
             enabled_utils: Vec::from([
+                "8ball".to_string(),
                 "temp".to_string(),
                 "mcstacks".to_string(),
                 "mcitems".to_string(),
