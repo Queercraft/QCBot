@@ -49,7 +49,14 @@ pub fn commands(command: String, content: String) -> String {
                     // Get the remainder
                     let left: i32 = items % 64;
                     // Format string
-                    output = format!("{} items break down into {} stacks with {} items left over", items, stacks, left);
+                    output = format!("{} item{} break{} down into {} stack{} with {} item{} left over", 
+                    items,
+                    if items == 1 { "" } else { "s" },
+                    if items != 1 { "" } else { "s" },
+                    stacks,
+                    if stacks == 1 { "" } else { "s" },
+                    left,
+                    if left == 1 { "" } else { "s" });
                 }
             }
             if output.is_empty() {
@@ -65,7 +72,17 @@ pub fn commands(command: String, content: String) -> String {
                         // Multiply by 32
                         let items: f32 = s * 64.0;
                         // Format string
-                        output = format!("{} stacks break down into {:.0} items", stacks, items);
+                        output = format!("{} stack{} break{} down into {:.0} item{}",
+                        // Replace stack count
+                         s,
+                        // Make stacks plural if needed
+                        if s == 1.0 { "" } else { "s" },
+                        // Make verb plural if needed
+                        if s != 1.0 { "" } else { "s" },
+                        // Replace item output
+                        items,
+                        // Make items plural if needed
+                        if items == 1.0 { "" } else { "s"});
                     } else {
                         output = "I dunno lol".to_string();
                     }
