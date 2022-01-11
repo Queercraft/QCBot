@@ -28,9 +28,9 @@ impl Default for Role {
             bypass_response_cooldown: false,
             perms: Vec::from([
                 "8ball".to_string(),
-                "temp".to_string(),
                 "mcstacks".to_string(),
                 "mcitems".to_string(),
+                "temp".to_string(),
                 "ping".to_string(),
                 ]),
         }
@@ -73,9 +73,9 @@ impl Default for Config {
             regex_response_cooldown: 45,
             enabled_utils: Vec::from([
                 "8ball".to_string(),
-                "temp".to_string(),
                 "mcstacks".to_string(),
                 "mcitems".to_string(),
+                "temp".to_string(),
             ]),
             responses_allowed_default: true,
             responses: HashMap::from([
