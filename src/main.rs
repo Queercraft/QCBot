@@ -113,6 +113,9 @@ impl EventHandler for Handler {
                         // Check if the command is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply
                         if CONFIG.responses_allowed_default || check_permission(command.to_string(), role) {
                             output = v.to_string();
+                            output = output
+                            .replace("%username%", &msg.author.name)
+                            .replace("%content%", &content.split_once(' ').unwrap_or_default().1.to_string())
                         } else {
                             if let Err(why) = msg.react(&ctx, '❌').await {
                                 println!("Error reacting to message: {:?}", why);
