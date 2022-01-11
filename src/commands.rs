@@ -39,6 +39,23 @@ pub fn commands(command: String, content: String) -> String {
                 output = "Usage: <Degrees> <C|F>".to_string();
             }
         }
+        "mcstacks" => {
+            // Get all the numbers in the message
+            let items = content.chars().filter(|c| c.is_digit(10)).collect::<String>();
+            if !items.is_empty() {
+                if let Some(items) = items.parse::<i32>().ok() {
+                    // Get the amount of stacks
+                    let stacks: i32 = items / 64;
+                    // Get the remainder
+                    let left: i32 = items % 64;
+                    // Format string
+                    output = format!("{} items break down into {} stacks with {} items left over", items, stacks, left);
+                }
+            }
+            if output.is_empty() {
+                output = "Usage: <number of items>".to_string();
+            }
+        }
         _ => (),
     }
     output

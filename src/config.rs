@@ -26,7 +26,11 @@ impl Default for Role {
             inherit: "".to_string(),
             bypass_regex: false,
             bypass_response_cooldown: false,
-            perms: Vec::from(["ping".to_string()]),
+            perms: Vec::from([
+                "ping".to_string(),
+                "temp".to_string(),
+                "mcstacks".to_string(),
+                ]),
         }
     }
 }
@@ -41,6 +45,7 @@ pub struct Config {
     pub response_cooldown: u64,
     pub regex_response_cooldown: u64,
     pub enabled_utils: Vec<String>,
+    pub responses_allowed_default: bool,
     pub responses: HashMap<String, String>,
     pub reponses_aliases: HashMap<String, Vec<String>>,
     pub regex_responses: HashMap<String, String>,
@@ -65,8 +70,10 @@ impl Default for Config {
             response_cooldown: 15,
             regex_response_cooldown: 45,
             enabled_utils: Vec::from([
-                "temp".to_string()
+                "temp".to_string(),
+                "mcstacks".to_string(),
             ]),
+            responses_allowed_default: true,
             responses: HashMap::from([
                 ("ping".to_string(), "Pong!".to_string()),
                 ("pong".to_string(), "Ping!".to_string()),
