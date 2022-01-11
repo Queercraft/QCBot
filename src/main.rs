@@ -111,7 +111,7 @@ impl EventHandler for Handler {
                 match &CONFIG.responses.get(command) {
                     Some(v) => {
                         // Check if the command is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply
-                        if check_permission(command.to_string(), role) {
+                        if CONFIG.responses_allowed_default || check_permission(command.to_string(), role) {
                             output = v.to_string();
                         } else {
                             if let Err(why) = msg.react(&ctx, '❌').await {
@@ -124,8 +124,7 @@ impl EventHandler for Handler {
                         if CONFIG.enabled_utils.contains(&command.to_string()) {
                             if check_permission(command.to_string(), role) {
                                 output = commands(command.to_string(), 
-                                content.strip_prefix(&format!("{}{} ", CONFIG.prefix, &command)
-                                .to_string()).unwrap_or_default().to_string());    
+                                content.split_once(' ').unwrap_or_default().1.to_string());
                             } else {
                                 if let Err(why) = msg.react(&ctx, '❌').await {
                                     println!("Error reacting to message: {:?}", why);
