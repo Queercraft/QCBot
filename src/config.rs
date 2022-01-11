@@ -30,6 +30,7 @@ impl Default for Role {
                 "ping".to_string(),
                 "temp".to_string(),
                 "mcstacks".to_string(),
+                "mcitems".to_string(),
                 ]),
         }
     }
@@ -72,6 +73,7 @@ impl Default for Config {
             enabled_utils: Vec::from([
                 "temp".to_string(),
                 "mcstacks".to_string(),
+                "mcitems".to_string(),
             ]),
             responses_allowed_default: true,
             responses: HashMap::from([

@@ -56,6 +56,26 @@ pub fn commands(command: String, content: String) -> String {
                 output = "Usage: <number of items>".to_string();
             }
         }
+        "mcitems" => {
+            // Get all the numbers (and periods) in the message
+            let stacks = content.chars().filter(|c| c.is_digit(10) || c == &'.').collect::<String>();
+            if !stacks.is_empty() {
+                if let Some(s) = stacks.parse::<f32>().ok() {
+                    if s.is_finite() {
+                        // Multiply by 32
+                        let items: f32 = s * 64.0;
+                        // Format string
+                        output = format!("{} stacks break down into {:.0} items", stacks, items);
+                    } else {
+                        output = "I dunno lol".to_string();
+                    }
+                }
+            }
+            if output.is_empty() {
+                output = "Usage: <number of stacks>".to_string();
+            }
+
+        }
         _ => (),
     }
     output
