@@ -48,8 +48,8 @@ pub struct Config {
     pub enabled_utils: Vec<String>,
     pub responses_allowed_default: bool,
     pub responses: HashMap<String, String>,
-    pub reponses_aliases: HashMap<String, Vec<String>>,
     pub regex_responses: HashMap<String, String>,
+    pub aliases: HashMap<String, Vec<String>>,
     pub roles: HashMap<String, Role>,
 }
 
@@ -80,11 +80,11 @@ impl Default for Config {
                 ("ping".to_string(), "Pong!".to_string()),
                 ("pong".to_string(), "Ping!".to_string()),
             ]),
-            reponses_aliases: HashMap::from([
-                ("ping".to_string(), Vec::from(["p".to_string(), "test".to_string()])),
-            ]),
             regex_responses: HashMap::from([
                 ("is the bot (?:here|on|alive|working)".to_string(), "Nope, definitely not".to_string()),
+            ]),
+            aliases: HashMap::from([
+                ("ping".to_string(), Vec::from(["p".to_string(), "test".to_string()])),
             ]),
             roles: HashMap::from([
                 ("default".to_string(), Role::default()),

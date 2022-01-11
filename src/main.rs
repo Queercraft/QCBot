@@ -94,7 +94,7 @@ impl EventHandler for Handler {
 
             // Check if the command is set as an alias everywhere
             // If so, redefine the command to what the alias is for
-            for (cmd, aliases) in &CONFIG.reponses_aliases {
+            for (cmd, aliases) in &CONFIG.aliases {
                 for a in aliases {
                     if command == a {
                         command = cmd
