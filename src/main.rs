@@ -124,8 +124,8 @@ impl EventHandler for Handler {
                         if CONFIG.enabled_utils.contains(&command.to_string()) {
                             if check_permission(command.to_string(), role) {
                                 output = commands(command.to_string(), 
-                                content.strip_prefix(&format!("{}{}", CONFIG.prefix, &command)
-                                .to_string()).unwrap_or_default().split(' ').take(1).next().unwrap_or_default().to_string());    
+                                content.strip_prefix(&format!("{}{} ", CONFIG.prefix, &command)
+                                .to_string()).unwrap_or_default().to_string());    
                             } else {
                                 if let Err(why) = msg.react(&ctx, '❌').await {
                                     println!("Error reacting to message: {:?}", why);
