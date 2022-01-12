@@ -31,6 +31,7 @@ impl Default for Role {
                 "mcstacks".to_string(),
                 "mcitems".to_string(),
                 "temp".to_string(),
+                "timezone".to_string(),
                 "ping".to_string(),
                 ]),
         }
@@ -76,6 +77,7 @@ impl Default for Config {
                 "mcstacks".to_string(),
                 "mcitems".to_string(),
                 "temp".to_string(),
+                "timezone".to_string(),
             ]),
             responses_allowed_default: true,
             responses: HashMap::from([
