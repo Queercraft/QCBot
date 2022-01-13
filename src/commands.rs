@@ -1,4 +1,4 @@
-use chrono::NaiveTime;
+use chrono::{DateTime, NaiveTime, Utc};
 use chrono_tz::Tz;
 use rand::Rng;
 use std::str::FromStr;
@@ -141,23 +141,32 @@ pub fn commands(command: String, content: String) -> String {
         }
         "timezone" => {
             // Get all characters matching 0-9, : and A/P and M
-            let time_str = content.split(' ').take(1).next().unwrap_or_default().to_uppercase()
-            .chars().filter(|c| c.is_digit(10) || c == &':' || c == &'A' || c == &'P' || c == &'M').collect::<String>();
-            let mut hhmm = String::new();
-            let mut time_formatted = String::new();
-            if let Ok(ntime) = NaiveTime::parse_from_str(&time_str, "%-I:%M%p") {
-                hhmm = ntime.format("%H%M").to_string();
-                time_formatted = ntime.format("%H:%M").to_string();
-            } else if let Ok(ntime) = NaiveTime::parse_from_str(&time_str, "%H:%M") {
-                hhmm = ntime.format("%H%M").to_string();
-                time_formatted = ntime.format("%H:%M").to_string();
+            let mut time_str = content.split(' ').take(1).next().unwrap_or_default().to_uppercase()
+            .chars().filter(|c| c.is_digit(10) || c == &':').collect::<String>();
+            let meridiem_str = content.split(' ').take(1).next().unwrap_or_default().to_uppercase()
+            .chars().filter(|c| c == &'A' || c == &'P' || c == &'M').collect::<String>();
+            if !time_str.contains(":") {
+                time_str.push_str(":00");
             }
-            if !hhmm.is_empty() {
-                let tz_str = content.split(' ').skip(1).next().unwrap_or_default().
-                chars().filter(|c| c == &'/' || c == &'_' || c.is_ascii_alphabetic()).collect::<String>();
-                if !tz_str.is_empty() {
-                    if let Ok(tz) = Tz::from_str(&tz_str) {
-                        output = format!("Check {} {} in your local time at https://time.is/compare/{}_in_{}",time_formatted, tz.name(), hhmm, tz.name());
+            time_str.push_str(&meridiem_str);
+            let tz_str = content.split(' ').skip(1).next().unwrap_or_default().
+            chars().filter(|c| c == &'/' || c == &'_' || c.is_ascii_alphabetic()).collect::<String>();
+            let to_tz_str = content.split(' ').skip(2).next().unwrap_or_default().
+            chars().filter(|c| c == &'/' || c == &'_' || c.is_ascii_alphabetic()).collect::<String>();
+            if !tz_str.is_empty() {
+                if let Ok(tz) = Tz::from_str(&tz_str) {
+                    if let Ok(ntime) = NaiveTime::parse_from_str(&time_str, "%-I:%M%p") {
+                        time_str = ntime.format("%H:%M").to_string();
+                    }
+                    if let Ok(ntime) = NaiveTime::parse_from_str(&time_str, "%H:%M") {
+                        let tz_now: DateTime<Tz> = Utc::today().with_timezone(&tz).and_time(ntime).unwrap();
+                        if let Ok(to_tz) = Tz::from_str(&to_tz_str) {
+                            output = format!("{} {} today in {} is {}, more at https://time.is/compare/{}_in_{}/{}",
+                            ntime.format("%H:%M").to_string(), tz.name(), to_tz.name(), tz_now.with_timezone(&to_tz).format("%H:%M"), ntime.format("%H%M").to_string(), tz.name(), to_tz.name());
+                        } else {
+                            output = format!("{} {} today in your local timezone is <t:{}>, more at https://time.is/compare/{}_in_{}",
+                            ntime.format("%H:%M").to_string(), tz.name(),tz_now.format("%s").to_string() , ntime.format("%H%M").to_string(), tz.name());
+                        }
                     }
                 }
             }
