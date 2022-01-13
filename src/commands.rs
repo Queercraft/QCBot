@@ -162,10 +162,10 @@ pub fn commands(command: String, content: String) -> String {
                         let tz_now: DateTime<Tz> = Utc::today().with_timezone(&tz).and_time(ntime).unwrap();
                         if let Ok(to_tz) = Tz::from_str(&to_tz_str) {
                             output = format!("{} {} today in {} is {}, more at https://time.is/compare/{}_in_{}/{}",
-                            ntime.format("%H:%M").to_string(), tz.name(), to_tz.name(), tz_now.with_timezone(&to_tz).format("%H:%M"), ntime.format("%H%M").to_string(), tz.name(), to_tz.name());
+                            ntime.format("%H:%M").to_string(), tz.name(), to_tz.name(), tz_now.with_timezone(&to_tz).format("%H:%M"), ntime.format("%H%M").to_string(), tz.name().split('/').last().unwrap(), to_tz.name().split('/').last().unwrap());
                         } else {
                             output = format!("{} {} today in your local timezone is <t:{}>, more at https://time.is/compare/{}_in_{}",
-                            ntime.format("%H:%M").to_string(), tz.name(),tz_now.format("%s").to_string() , ntime.format("%H%M").to_string(), tz.name());
+                            ntime.format("%H:%M").to_string(), tz.name(),tz_now.format("%s").to_string() , ntime.format("%H%M").to_string(), tz.name().split('/').last().unwrap());
                         }
                     }
                 }
