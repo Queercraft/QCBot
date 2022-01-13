@@ -171,7 +171,7 @@ pub fn commands(command: String, content: String) -> String {
                 }
             }
             if output.is_empty() {
-                output = "Usage: <HH:MM(AM/PM)> <TZ>".to_string();
+                output = "Usage: <HH:MM(AM/PM)> <TZ> (TZ)".to_string();
             }
         }
         _ => (),
