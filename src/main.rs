@@ -164,6 +164,7 @@ impl EventHandler for Handler {
                             }
                             self.regex_cooldowns.write().unwrap().insert(regex.to_string(), Instant::now());
                         }
+                        break;
                     }
                 }
             }
