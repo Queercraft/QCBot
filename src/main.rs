@@ -155,7 +155,7 @@ impl EventHandler for Handler {
             if role.bypass_regex == false {
                 // Check if the message matches a defined regex
                 for (regex, response) in &CONFIG.regex_responses {
-                    if Regex::new(regex).unwrap().is_match(&content) {
+                    if Regex::new(&regex.to_lowercase()).unwrap().is_match(&content.to_lowercase()) {
                         // Check if the regex is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply
                         if !self.regex_cooldowns.read().unwrap().contains_key(regex) ||
                         self.regex_cooldowns.read().unwrap().get(regex).unwrap().elapsed().as_secs() > CONFIG.regex_response_cooldown {
