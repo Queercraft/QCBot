@@ -13,7 +13,7 @@ use std::time::Instant;
 mod config;
 
 use config::Role;
-use config::CONFIG;
+use config::Config;
 
 mod commands;
 
@@ -24,6 +24,7 @@ struct General;
 
 // Define hashmaps for cooldowns
 struct Handler {
+    config: Config,
     response_cooldowns: Arc<RwLock<HashMap<String, Instant>>>,
     regex_cooldowns: Arc<RwLock<HashMap<String, Instant>>>,
 }
@@ -32,18 +33,19 @@ struct Handler {
 impl Handler {
     pub fn new() -> Handler {
         Handler {
+            config: Config::get(),
             response_cooldowns: Arc::new(RwLock::new(HashMap::new())),
             regex_cooldowns: Arc::new(RwLock::new(HashMap::new()))
         }
     }
 }
 
-fn check_permission(command: String, role: &Role) -> bool {
+fn check_permission(config: &Config, command: String, role: &Role) -> bool {
     if role.perms.contains(&command) {
         return true;
     } else {
         if !role.inherit.is_empty() {
-            return check_permission(command, CONFIG.roles.get(&role.inherit).unwrap());
+            return check_permission(config, command, &config.roles.get(&role.inherit).unwrap());
         } else {
             return false;
         }
@@ -62,7 +64,7 @@ impl EventHandler for Handler {
             if msg.webhook_id.is_none() {
                 if let Some(member) = &msg.member {
                     for memberrole in &member.roles {
-                        if let Some((name, _role)) = CONFIG.roles.iter().find(|(_name, role)|
+                        if let Some((name, _role)) = self.config.roles.iter().find(|(_name, role)|
                         &role.id == memberrole.as_u64()) {
                                 r = name.to_string();
                                 break;
@@ -71,7 +73,7 @@ impl EventHandler for Handler {
                 }
             // If the message is from a webhook
             } else {    
-                for (name, role) in &CONFIG.roles {
+                for (name, role) in &self.config.roles {
                     if !role.webhook_regex.is_empty() &&  Regex::new(&role.webhook_regex).unwrap().is_match(&msg.author.name) {
                         r = name.to_string();
                         break;
@@ -84,21 +86,21 @@ impl EventHandler for Handler {
             if r == "" {
                 r = "default".to_string();
             }
-            let role = &CONFIG.roles.get(&r).unwrap(); 
+            let role = self.config.roles.get(&r).unwrap(); 
 
-            let content = Regex::new(&CONFIG.trim_regex).unwrap().replace_all(&msg.content, "");
+            let content = Regex::new(&self.config.trim_regex).unwrap().replace_all(&msg.content, "");
 
             // Check if the message starts with the prefix
-            if content.starts_with(&CONFIG.prefix) {
+            if content.starts_with(&self.config.prefix) {
                 // Get the word after the prefix
-                let mut command = content.strip_prefix(&CONFIG.prefix).unwrap_or_default().split(' ').take(1).next().unwrap_or_default();
+                let mut command = content.strip_prefix(&self.config.prefix).unwrap_or_default().split(' ').take(1).next().unwrap_or_default();
 
                 // Check if the command is set as an alias everywhere
                 // If so, redefine the command to what the alias is for
-                for (cmd, aliases) in &CONFIG.aliases {
+                for (cmd, aliases) in &self.config.aliases {
                     for a in aliases {
                         if command == a {
-                            command = cmd
+                            command = &cmd
                         }
                     }
                 }
@@ -106,13 +108,13 @@ impl EventHandler for Handler {
                 let mut output = String::new();
                 
                 if role.bypass_response_cooldown == true || !self.response_cooldowns.read().unwrap().contains_key(command) || 
-                self.response_cooldowns.read().unwrap().get(command).unwrap().elapsed().as_secs() > CONFIG.response_cooldown { 
+                self.response_cooldowns.read().unwrap().get(command).unwrap().elapsed().as_secs() > self.config.response_cooldown { 
 
                 // Check if the command is a canned response
-                    match &CONFIG.responses.get(command) {
+                    match self.config.responses.get(command) {
                         Some(v) => {
                             // Check if the command is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply
-                            if CONFIG.responses_allowed_default || check_permission(command.to_string(), role) {
+                            if self.config.responses_allowed_default || check_permission(&self.config, command.to_string(), role) {
                                 output = v.to_string();
                                 output = output
                                 .replace("%username%", &msg.author.name)
@@ -125,8 +127,8 @@ impl EventHandler for Handler {
                         }
                         None => {
                             // Send to command executor
-                            if CONFIG.enabled_utils.contains(&command.to_string()) {
-                                if check_permission(command.to_string(), role) {
+                            if self.config.enabled_utils.contains(&command.to_string()) {
+                                if check_permission(&self.config, command.to_string(), role) {
                                     output = commands(command.to_string(), 
                                     content.split_once(' ').unwrap_or_default().1.to_string());
                                 } else {
@@ -155,11 +157,11 @@ impl EventHandler for Handler {
             } else {
                 if role.bypass_regex == false {
                     // Check if the message matches a defined regex
-                    for (regex, response) in &CONFIG.regex_responses {
+                    for (regex, response) in &self.config.regex_responses {
                         if Regex::new(&regex.to_lowercase()).unwrap().is_match(&content.to_lowercase()) {
                             // Check if the regex is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply
                             if !self.regex_cooldowns.read().unwrap().contains_key(regex) ||
-                            self.regex_cooldowns.read().unwrap().get(regex).unwrap().elapsed().as_secs() > CONFIG.regex_response_cooldown {
+                            self.regex_cooldowns.read().unwrap().get(regex).unwrap().elapsed().as_secs() > self.config.regex_response_cooldown {
                                 if let Err(why) = msg.reply(&ctx, response).await {
                                     println!("Error sending message: {:?}", why);
                                 }
@@ -181,7 +183,7 @@ async fn main() {
         .group(&GENERAL_GROUP);
 
     // Login with a bot token from the config file
-    let mut client = Client::builder(&CONFIG.bot_token)
+    let mut client = Client::builder(Config::get().bot_token)
         .event_handler(Handler::new())
         .framework(framework)
         .await

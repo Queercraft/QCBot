@@ -4,8 +4,6 @@ use toml::{to_string, from_str};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use lazy_static::lazy_static;
-
 #[derive(Serialize, Deserialize)]
 #[serde(default)]
 pub struct Role {
@@ -96,11 +94,6 @@ impl Default for Config {
             ])
         }
     }
-}
-
-// Load the config file once
-lazy_static! {
-    pub static ref CONFIG: Config = Config::get();
 }
 
 impl Config {
