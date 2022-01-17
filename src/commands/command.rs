@@ -21,14 +21,3 @@ pub trait Command: Sync + Send  {
     fn name(&self) -> &'static str;
     fn execute(&self, input: String) -> Result<String, CommandError>;
 }
-
-pub struct TestCommand;
-
-impl Command for TestCommand {
-    fn name(&self) -> &'static str {
-        "test"
-    }
-    fn execute(&self, _input: String) -> Result<String, CommandError> {
-        Ok("Testing!!!".to_string())
-    }
-}
