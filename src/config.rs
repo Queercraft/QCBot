@@ -11,7 +11,7 @@ pub struct Role {
     pub webhook_regex: String,
     pub inherit: String,
     pub bypass_regex: bool,
-    pub bypass_response_cooldown: bool,
+    pub bypass_command_cooldown: bool,
     pub perms: Vec<String>,
 }
 
@@ -23,7 +23,7 @@ impl Default for Role {
             webhook_regex: "".to_string(),
             inherit: "".to_string(),
             bypass_regex: false,
-            bypass_response_cooldown: false,
+            bypass_command_cooldown: false,
             perms: Vec::from([
                 "8ball".to_string(),
                 "mcstacks".to_string(),
@@ -43,7 +43,7 @@ pub struct Config {
     pub bot_token: String,
     pub prefix: String,
     pub trim_regex: String,
-    pub response_cooldown: u64,
+    pub command_cooldown: u64,
     pub regex_response_cooldown: u64,
     pub enabled_utils: Vec<String>,
     pub responses_allowed_default: bool,
@@ -61,14 +61,14 @@ impl Default for Config {
             webhook_regex: "\\[Admin\\].*".to_string(),
             inherit: "default".to_string(),
             bypass_regex: true,
-            bypass_response_cooldown: true,
+            bypass_command_cooldown: true,
             perms: Vec::from(["pong".to_string()]),
         };
         Self {
             bot_token: "XXXXXX".to_string(),
             prefix: "!".to_string(),
             trim_regex: "".to_string(),
-            response_cooldown: 15,
+            command_cooldown: 15,
             regex_response_cooldown: 45,
             enabled_utils: Vec::from([
                 "8ball".to_string(),

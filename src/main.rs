@@ -17,29 +17,54 @@ use config::Config;
 
 mod commands;
 
-use commands::commands;
+use commands::command::{Command, CommandError, TestCommand};
+use commands::minecraft::{McItemsCommand, McStacksCommand};
+use commands::temperature::TemperatureCommand;
+use commands::timezone::TimezoneCommand;
 
 #[group]
 struct General;
 
 // Define hashmaps for cooldowns
 struct Handler {
+    // The config for the bot
     config: Config,
-    response_cooldowns: Arc<RwLock<HashMap<String, Instant>>>,
+    // HashMap of commands by name and the function
+    registered_commands: Arc<RwLock<HashMap<String, Box<dyn Command>>>>,
+    // HashMap of command cooldowns
+    command_cooldowns: Arc<RwLock<HashMap<String, Instant>>>,
+    // HashMap of Regex cooldowns
     regex_cooldowns: Arc<RwLock<HashMap<String, Instant>>>,
 }
 
-// Create hashmaps on the handler
 impl Handler {
-    pub fn new() -> Handler {
-        Handler {
-            config: Config::get(),
-            response_cooldowns: Arc::new(RwLock::new(HashMap::new())),
-            regex_cooldowns: Arc::new(RwLock::new(HashMap::new()))
-        }
+    // Add command
+    pub fn register_command(&mut self, command: Box<dyn Command>) {
+        let name = &command.name();
+        self.registered_commands.write().unwrap().insert(name.to_string(), command);
     }
+    // Create handler with data
+    pub fn new() -> Handler {
+        let mut handler = Handler {
+            config: Config::get(),
+            registered_commands: Arc::new(RwLock::new(HashMap::new())),
+            command_cooldowns: Arc::new(RwLock::new(HashMap::new())),
+            regex_cooldowns: Arc::new(RwLock::new(HashMap::new()))
+        };
+        // TODO make this cleaner
+        // Register commands
+        Self::register_command(&mut handler, Box::new(TestCommand));
+        Self::register_command(&mut handler, Box::new(McItemsCommand));
+        Self::register_command(&mut handler, Box::new(McStacksCommand));
+        Self::register_command(&mut handler, Box::new(TemperatureCommand));
+        Self::register_command(&mut handler, Box::new(TimezoneCommand));
+        // Return handler
+        handler
+    }
+
 }
 
+// Check permission with function
 fn check_permission(config: &Config, command: String, role: &Role) -> bool {
     if role.perms.contains(&command) {
         return true;
@@ -86,8 +111,11 @@ impl EventHandler for Handler {
             if r == "" {
                 r = "default".to_string();
             }
+
+            // Set role
             let role = self.config.roles.get(&r).unwrap(); 
 
+            // Trim specified regex from messages
             let content = Regex::new(&self.config.trim_regex).unwrap().replace_all(&msg.content, "");
 
             // Check if the message starts with the prefix
@@ -104,17 +132,21 @@ impl EventHandler for Handler {
                         }
                     }
                 }
-
+                
+                // Create string that will be the output
                 let mut output = String::new();
                 
-                if role.bypass_response_cooldown == true || !self.response_cooldowns.read().unwrap().contains_key(command) || 
-                self.response_cooldowns.read().unwrap().get(command).unwrap().elapsed().as_secs() > self.config.response_cooldown { 
+                // Check if command is on cooldown or user bypasses cooldown 
+                if role.bypass_command_cooldown == true || !self.command_cooldowns.read().unwrap().contains_key(command) || 
+                self.command_cooldowns.read().unwrap().get(command).unwrap().elapsed().as_secs() > self.config.command_cooldown { 
 
                 // Check if the command is a canned response
                     match self.config.responses.get(command) {
                         Some(v) => {
-                            // Check if the command is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, send reply
+                            // Check if the command is in the cooldown list or has been used more than the cooldown time in seconds ago. If both are false, set reply
                             if self.config.responses_allowed_default || check_permission(&self.config, command.to_string(), role) {
+                                // Set cooldown
+                                self.command_cooldowns.write().unwrap().insert(command.to_string(), Instant::now());
                                 output = v.to_string();
                                 output = output
                                 .replace("%username%", &msg.author.name)
@@ -129,8 +161,27 @@ impl EventHandler for Handler {
                             // Send to command executor
                             if self.config.enabled_utils.contains(&command.to_string()) {
                                 if check_permission(&self.config, command.to_string(), role) {
-                                    output = commands(command.to_string(), 
-                                    content.split_once(' ').unwrap_or_default().1.to_string());
+                                    match self.registered_commands.read().unwrap().get(command) {
+                                        Some(cmd) => {
+                                            output = match cmd.execute(content.split_once(' ').unwrap_or_default().1.to_string()) {
+                                                Ok(o) => {
+                                                    // Set cooldown and set reply
+                                                    self.command_cooldowns.write().unwrap().insert(command.to_string(), Instant::now());
+                                                    o
+                                                },
+                                                Err(CommandError::BadUsage(o)) => {
+                                                    o
+                                                }
+                                                Err(CommandError::InvalidSyntax(o)) => {
+                                                    o
+                                                }
+                                            }
+                                        }
+                                        // Do nothing if the command isn't found
+                                        None => ()
+                                    }
+                                    // output = commands(command.to_string(), 
+                                    // content.split_once(' ').unwrap_or_default().1.to_string());
                                 } else {
                                     if let Err(why) = msg.react(&ctx, '❌').await {
                                         println!("Error reacting to message: {:?}", why);
@@ -140,13 +191,13 @@ impl EventHandler for Handler {
                         }
                     }
 
+                    // Send message if there was an output
                     if !output.is_empty() {
-                        self.response_cooldowns.write().unwrap().insert(command.to_string(), Instant::now());
                         if let Err(why) = msg.reply(&ctx, output).await {
                             println!("Error sending message: {:?}", why);
                         }
                     }
-
+                // React with hourglass emote if command is on cooldown
                 } else {
                     if let Err(why) = msg.react(&ctx, '⏳').await {
                         println!("Error reacting to message: {:?}", why);
@@ -167,6 +218,7 @@ impl EventHandler for Handler {
                                 }
                                 self.regex_cooldowns.write().unwrap().insert(regex.to_string(), Instant::now());
                             }
+                            // Break loop
                             break;
                         }
                     }
