@@ -11,12 +11,10 @@ use std::collections::HashMap;
 use std::time::Instant;
 
 mod config;
-
 use config::Role;
 use config::Config;
 
 mod commands;
-
 use commands::{Command, CommandError};
 use commands::minecraft::{McItemsCommand, McStacksCommand};
 use commands::temperature::TemperatureCommand;

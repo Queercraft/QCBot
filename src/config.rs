@@ -2,7 +2,7 @@ use std::fs::{read_to_string, write};
 use std::path::PathBuf;
 use toml::{to_string, from_str};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 #[derive(Serialize, Deserialize)]
 #[serde(default)]
@@ -47,10 +47,10 @@ pub struct Config {
     pub regex_response_cooldown: u64,
     pub enabled_utils: Vec<String>,
     pub responses_allowed_default: bool,
-    pub responses: HashMap<String, String>,
-    pub regex_responses: HashMap<String, String>,
-    pub aliases: HashMap<String, Vec<String>>,
-    pub roles: HashMap<String, Role>,
+    pub responses: BTreeMap<String, String>,
+    pub regex_responses: BTreeMap<String, String>,
+    pub aliases: BTreeMap<String, Vec<String>>,
+    pub roles: BTreeMap<String, Role>,
 }
 
 impl Default for Config {
@@ -78,17 +78,17 @@ impl Default for Config {
                 "timezone".to_string(),
             ]),
             responses_allowed_default: true,
-            responses: HashMap::from([
+            responses: BTreeMap::from([
                 ("ping".to_string(), "Pong!".to_string()),
                 ("pong".to_string(), "Ping!".to_string()),
             ]),
-            regex_responses: HashMap::from([
+            regex_responses: BTreeMap::from([
                 ("is the bot (?:here|on|alive|working)".to_string(), "Nope, definitely not".to_string()),
             ]),
-            aliases: HashMap::from([
+            aliases: BTreeMap::from([
                 ("ping".to_string(), Vec::from(["p".to_string(), "test".to_string()])),
             ]),
-            roles: HashMap::from([
+            roles: BTreeMap::from([
                 ("default".to_string(), Role::default()),
                 ("admin".to_string(), admin),
             ])
