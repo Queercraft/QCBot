@@ -1,10 +1,11 @@
 use std::sync::{Arc, RwLock};
 use std::fmt;
 
+pub mod admin;
 pub mod minecraft;
+pub mod regex;
 pub mod temperature;
 pub mod timezone;
-pub mod admin;
 
 use crate::config::{Config, Role};
 

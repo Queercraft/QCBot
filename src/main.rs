@@ -23,6 +23,7 @@ use commands::minecraft::{McItemsCommand, McStacksCommand};
 use commands::temperature::TemperatureCommand;
 use commands::timezone::TimezoneCommand;
 use commands::admin::ReloadCommand;
+use commands::regex::RegexCommand;
 
 #[group]
 struct General;
@@ -59,6 +60,8 @@ impl Handler {
         Self::register_command(&mut handler, Box::new(TemperatureCommand));
         Self::register_command(&mut handler, Box::new(TimezoneCommand));
         Self::register_command(&mut handler, Box::new(ReloadCommand));
+        Self::register_command(&mut handler, Box::new(RegexCommand));
+
         // Return handler
         handler
     }

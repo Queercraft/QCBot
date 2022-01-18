@@ -25,6 +25,7 @@ impl Default for Role {
             bypass_regex: false,
             bypass_command_cooldown: false,
             perms: Vec::from([
+                "cmd.regex".to_string(),
                 "cmd.mcstacks".to_string(),
                 "cmd.mcitems".to_string(),
                 "cmd.temperature".to_string(),
@@ -68,6 +69,7 @@ impl Default for Config {
             command_cooldown: 15,
             regex_response_cooldown: 45,
             enabled_utils: Vec::from([
+                "regex".to_string(),
                 "mcstacks".to_string(),
                 "mcitems".to_string(),
                 "temperature".to_string(),
