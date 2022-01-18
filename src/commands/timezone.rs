@@ -3,7 +3,7 @@ use chrono_tz::Tz;
 
 use std::str::FromStr;
 
-use crate::commands::command::{Command, CommandError};
+use crate::commands::{Command, CommandError};
 
 pub struct TimezoneCommand;
 

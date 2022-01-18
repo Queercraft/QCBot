@@ -1,4 +1,4 @@
-use crate::commands::command::{Command, CommandError};
+use crate::commands::{Command, CommandError};
 
 pub struct McItemsCommand;
 

@@ -17,7 +17,7 @@ use config::Config;
 
 mod commands;
 
-use commands::command::{Command, CommandError};
+use commands::{Command, CommandError};
 use commands::minecraft::{McItemsCommand, McStacksCommand};
 use commands::temperature::TemperatureCommand;
 use commands::timezone::TimezoneCommand;
