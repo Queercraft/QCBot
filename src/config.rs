@@ -4,7 +4,7 @@ use toml::{to_string, from_str};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(default)]
 pub struct Role {
     pub id: u64,
@@ -25,12 +25,10 @@ impl Default for Role {
             bypass_regex: false,
             bypass_command_cooldown: false,
             perms: Vec::from([
-                "8ball".to_string(),
-                "mcstacks".to_string(),
-                "mcitems".to_string(),
-                "temp".to_string(),
-                "timezone".to_string(),
-                "ping".to_string(),
+                "cmd.mcstacks".to_string(),
+                "cmd.mcitems".to_string(),
+                "cmd.temperature".to_string(),
+                "cmd.timezone".to_string(),
                 ]),
         }
     }
@@ -46,7 +44,6 @@ pub struct Config {
     pub command_cooldown: u64,
     pub regex_response_cooldown: u64,
     pub enabled_utils: Vec<String>,
-    pub responses_allowed_default: bool,
     pub responses: BTreeMap<String, String>,
     pub regex_responses: BTreeMap<String, String>,
     pub aliases: BTreeMap<String, Vec<String>>,
@@ -62,7 +59,7 @@ impl Default for Config {
             inherit: "default".to_string(),
             bypass_regex: true,
             bypass_command_cooldown: true,
-            perms: Vec::from(["pong".to_string()]),
+            perms: Vec::from(["admin.reload".to_string()]),
         };
         Self {
             bot_token: "XXXXXX".to_string(),
@@ -71,13 +68,11 @@ impl Default for Config {
             command_cooldown: 15,
             regex_response_cooldown: 45,
             enabled_utils: Vec::from([
-                "8ball".to_string(),
                 "mcstacks".to_string(),
                 "mcitems".to_string(),
-                "temp".to_string(),
+                "temperature".to_string(),
                 "timezone".to_string(),
             ]),
-            responses_allowed_default: true,
             responses: BTreeMap::from([
                 ("ping".to_string(), "Pong!".to_string()),
                 ("pong".to_string(), "Ping!".to_string()),
