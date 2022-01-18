@@ -115,7 +115,7 @@ impl EventHandler for Handler {
             // Check if the message starts with the prefix, if so, execute commands
             if content.starts_with(&self.config.read().unwrap().prefix) {
                 // Get the word after the prefix
-                let mut command = content.strip_prefix(&self.config.read().unwrap().prefix).unwrap_or_default().split(' ').take(1).next().unwrap_or_default().to_string();
+                let mut command = content.strip_prefix(&self.config.read().unwrap().prefix).unwrap_or_default().split(' ').take(1).next().unwrap_or_default().to_string().to_lowercase();
 
                 // Check if the command is set as an alias
                 // If so, redefine the command to what the alias is for
