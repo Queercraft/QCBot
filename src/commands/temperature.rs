@@ -8,7 +8,7 @@ pub struct TemperatureCommand;
 
 impl Command for TemperatureCommand {
     fn name(&self) -> &'static str {
-        "temp"
+        "temperature"
     }
     fn usage(&self) -> &'static str {
         "Usage: <Degrees> <C|F>"
