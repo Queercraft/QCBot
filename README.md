@@ -4,7 +4,7 @@
 
 ## About
 
-RustyRails is a simpple responder Discord bot with a few utilities builtin. 
+RustyRails is a simple responder Discord bot with a few utilities builtin. 
 This bot has configurable canned responses, regexes and permissions that can be configured from `config.toml`.  
 
 RustyRails is made to work in conjunction with Minecraft servers using Discord integration, and as such provides the ability to parse roles from a webhooks title with a regex match.  
