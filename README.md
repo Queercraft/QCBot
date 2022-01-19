@@ -97,6 +97,10 @@ The bot will automatically generate this configuration file on first start. The 
 | **\[roles.**<RoleName\>**\]** | | |
 | | By defining a header with the name `role.<ROLE>`, you can create a role. A role can give or deny permissions to a command of feature | `[roles.admin]` and `[roles.default]` |
 | `id` | The Discord Role ID of this role, if not set this role can still be used by setting it as inherited in other roles that do. | `0` |
-| `webhook_regex` | This uses a regex match on a message if it was sent from a regex to get this role. This can be used to set permissions across a Minecraft (or other game) -> Discord bridge | `""` (None) |
-| `inherit` | This makes a role inherit a different role. The bot will recurse through the roles until it finds a match for a permission | `""` (None) |
+| `webhook_regex` | This uses a regex match on a message if it was sent from a webhook to get this role. This can be used to set permissions across a Minecraft (or other game) -> Discord bridge | `""` (None) |
+| `inherit` | This makes a role inherit a different role. The bot will recurse through the roles until it finds a match for a permission. Make sure these don't loop! | `""` (None) |
 | `perms` | This is a list of permissions the role has. A permission can be negated by prefixing it with a `-` character. | `["cmd.regex", "cmd.mcstacks", "cmd.mcitems", "cmd.temperature", "cmd.timezone"]` |
+
+## Installation
+You can get prebuilt binaries from GitHub releases at [this repositories' releases](https://github.com/diademiemi/RustyRails/releases), which are automatically built with GitHub Actions.  
+Alternatively, you can compile this project yourself by cloning this repository and running `cargo build --release`. This will produce binaries in `target/release`, or you can run `cargo run --release` to run it directly from cargo.  
