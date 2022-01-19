@@ -63,16 +63,12 @@ ping = ["p", "test"]
 id = 123456781234567812
 webhook_regex = "\\[Admin\\].*"
 inherit = "default"
-bypass_regex = true
-bypass_command_cooldown = true
-perms = ["admin.reload"]
+perms = ["admin.reload", "bypass.regex", "bypass.cooldown"]
 
 [roles.default]
 id = 0
 webhook_regex = ""
 inherit = ""
-bypass_regex = false
-bypass_command_cooldown = false
 perms = ["cmd.regex", "cmd.mcstacks", "cmd.mcitems", "cmd.temperature", "cmd.timezone"]
 ```
 
@@ -86,7 +82,7 @@ The bot will automatically generate this configuration file on first start. The 
 | `bot_token` |  Needs to be set for the bot to run. This is the bot token obtained from the [Discord Developer Portal](https://discord.com/developers/applications) | `"XXXXXX"` (Replace this!) |
 | `prefix` | The prefix for all the bot's commands, this can be any string  | `"!"` |
 | `trim_regex` | Anything matching this regex will be trimmed before the message is processed by the bot, this is useful for if any integrations your server has produces messages with junk data | `""` (None) |
-| `command_cooldown` | This defines the cooldown for all the commands, while a command is on cooldown, only members of a role with the `bypass.command_cooldown` permission can use this command. | `15` |
+| `command_cooldown` | This defines the cooldown for all the commands, while a command is on cooldown, only members of a role with the `bypass.cooldown` permission can use this command. | `15` |
 | `regex_response_cooldown` | This is the amount of time the bot will wait before automatically replying to a message with a certain regex match. The regex can still be gotten by using the `!regex` command | `45` |
 | `enabled_utils` | This is a list of the bots utilities that are enabled, removing a utility here means it can't be used by anyone | `["regex", "mcstacks", "mcitems", "temperature", "timezone"]` |
 | | | |
@@ -94,7 +90,7 @@ The bot will automatically generate this configuration file on first start. The 
 | | Under the responses header, a table of commands to canned responses can be defined. Responses are allowed by default, but can be negated with the `-response.<command>` perm | `ping = "Pong!"` | 
 | | | |
 | **\[regex_responses\]**| | |
-| | Under the regex_responses header, a table of regexes to their responses can be defined | `"is the bot (?:here|on|alive|working)" = "Nope, definitely not"` | 
+| | Under the regex_responses header, a table of regexes to their responses can be defined. Users with the `bypass.regex` permission will not trigger regex responses | `"is the bot (?:here|on|alive|working)" = "Nope, definitely not"` | 
 | | | |
 | **\[aliases\]**| | |
 | | Under the aliases header, a table of aliases for commands can be defined. | `ping = ["p", "test"]` | 

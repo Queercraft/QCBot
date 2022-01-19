@@ -10,8 +10,6 @@ pub struct Role {
     pub id: u64,
     pub webhook_regex: String,
     pub inherit: String,
-    pub bypass_regex: bool,
-    pub bypass_command_cooldown: bool,
     pub perms: Vec<String>,
 }
 
@@ -22,8 +20,6 @@ impl Default for Role {
             id: 0,
             webhook_regex: "".to_string(),
             inherit: "".to_string(),
-            bypass_regex: false,
-            bypass_command_cooldown: false,
             perms: Vec::from([
                 "cmd.regex".to_string(),
                 "cmd.mcstacks".to_string(),
@@ -58,9 +54,11 @@ impl Default for Config {
             id: 123456781234567812,
             webhook_regex: "\\[Admin\\].*".to_string(),
             inherit: "default".to_string(),
-            bypass_regex: true,
-            bypass_command_cooldown: true,
-            perms: Vec::from(["admin.reload".to_string()]),
+            perms: Vec::from([
+                "admin.reload".to_string(),
+                "bypass.regex".to_string(),
+                "bypass.cooldown".to_string(),
+            ]),
         };
         Self {
             bot_token: "XXXXXX".to_string(),

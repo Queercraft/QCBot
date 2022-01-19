@@ -13,6 +13,7 @@ use std::time::Instant;
 mod util;
 use util::response::response;
 use util::regexresponse::regexresponse;
+use util::perms::check_permission;
 
 mod config;
 use config::Config;
@@ -131,7 +132,7 @@ impl EventHandler for Handler {
                 }
                 
                 // Check if command isn't on cooldown or user bypasses cooldown 
-                if role.bypass_command_cooldown == true || !self.command_cooldowns.read().unwrap().contains_key(&command.to_string()) || 
+                if check_permission(&self.config.read().unwrap(), "bypass.cooldown".to_string(), &role) || !self.command_cooldowns.read().unwrap().contains_key(&command.to_string()) || 
                 self.command_cooldowns.read().unwrap().get(&command.to_string()).unwrap().elapsed().as_secs() > self.config.read().unwrap().command_cooldown {
                     // Check if the command has a response
                     match response(self.config.clone(), &role, command.to_string()) {
@@ -185,7 +186,7 @@ impl EventHandler for Handler {
                     emotes.push('⏳');
                 }
 
-            } else if !role.bypass_regex {
+            } else if !check_permission(&self.config.read().unwrap(), "bypass.regex".to_string(), &role) {
                 if let Some(r) = regexresponse(self.config.clone(), content.to_string()) {
                     if !self.regex_cooldowns.read().unwrap().contains_key(&r.1) ||
                     self.regex_cooldowns.read().unwrap().get(&r.1).unwrap().elapsed().as_secs() > self.config.read().unwrap().regex_response_cooldown {
