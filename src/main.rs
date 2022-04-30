@@ -1,4 +1,5 @@
 use serenity::async_trait;
+use serenity::prelude::GatewayIntents;
 use serenity::client::{Client, Context, EventHandler};
 use serenity::model::channel::Message;
 use serenity::framework::standard::{
@@ -75,7 +76,7 @@ impl Handler {
 impl EventHandler for Handler {
     // Run on message
     async fn message(&self, ctx: Context, msg: Message) {
-        if !msg.is_own(&ctx).await {
+        if !msg.is_own(&ctx) {
             // Get users permission group
             let mut r = String::new(); 
             // If the message is not from a webhook
@@ -220,7 +221,9 @@ async fn main() {
         .group(&GENERAL_GROUP);
 
     // Login with a bot token from the config file
-    let mut client = Client::builder(Config::get().bot_token)
+    let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
+
+    let mut client = Client::builder(Config::get().bot_token, intents)
         .event_handler(Handler::new())
         .framework(framework)
         .await
