@@ -1,16 +1,16 @@
-<img src="img/icon.png" alt="RustyRails" title = "RustyRails" align="right" width="250" height="250" />
+<img src="img/icon.png" alt="QCBot" title="QCBot" align="right" width="250" height="250" />
 
-# RustyRails
+# QCBot
 
 ## About
 
-RustyRails is a simple responder Discord bot with a few utilities builtin. 
+QCBot is a simple responder Discord bot with a few utilities builtin. 
 This bot has configurable canned responses, regexes and permissions that can be configured from `config.toml`.  
 
-RustyRails is made to work in conjunction with Minecraft servers using Discord integration, and as such provides the ability to parse roles from a webhooks title with a regex match.  
+QCBot is made to work in conjunction with Minecraft servers using Discord integration, and as such provides the ability to parse roles from a webhooks title with a regex match.  
 
 ## Purpose
-RustyRails is mainly designed to assist in directing users to resources such by having easily canned responses and regex responses which can automatically answer to common questions. However, this bot also includes a few conversion utilities, like converting timezones, temperatures and Minecraft items to stacks and reversed. More utilities may be added in the future!
+QCBot is mainly designed to assist in directing users to resources such by having easily canned responses and regex responses which can automatically answer to common questions. However, this bot also includes a few conversion utilities, like converting timezones, temperatures and Minecraft items to stacks and reversed. More utilities may be added in the future!
 
 ## Utilities
 
@@ -102,5 +102,5 @@ The bot will automatically generate this configuration file on first start. The 
 | `perms` | This is a list of permissions the role has. A permission can be negated by prefixing it with a `-` character. | `["cmd.regex", "cmd.mcstacks", "cmd.mcitems", "cmd.temperature", "cmd.timezone"]` |
 
 ## Installation
-You can get prebuilt binaries from GitHub releases at [this repositories' releases](https://github.com/diademiemi/RustyRails/releases), which are automatically built with GitHub Actions.  
+You can get prebuilt binaries from GitHub releases at [this repositories' releases](https://github.com/Queercraft/QCBot/releases), which are automatically built with GitHub Actions.  
 Alternatively, you can compile this project yourself by cloning this repository and running `cargo build --release`. This will produce binaries in `target/release`, or you can run `cargo run --release` to run it directly from cargo.  
