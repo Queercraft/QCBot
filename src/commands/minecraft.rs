@@ -99,3 +99,52 @@ impl Command for McStacksCommand {
     }
 }
 
+pub struct McShulkersCommand;
+
+impl Command for McShulkersCommand {
+    fn name(&self) -> &'static str {
+        "mcshulkers"
+    }
+    fn usage(&self) -> &'static str {
+        "Usage: <number of items>"
+    }
+    fn about(&self) -> &'static str {
+        "Converts a given amount of Minecraft items to how many shulkers, stacks. and remaining items they make up."
+    }
+    fn execute(&self, config: Arc<RwLock<Config>>, role: &Role, input: String) -> Result<String, CommandError> {
+        if !check_permission(&config.read().unwrap(), "cmd.mcstacks".to_string(), role) {
+            return Err(CommandError::NoPerms);
+        }
+ 
+        // Get all the numbers in the message
+        let items = input.chars().filter(|c| c.is_digit(10)).collect::<String>();
+        if !items.is_empty() {
+            if let Some(items) = items.parse::<i32>().ok() {
+                let shulkers: i32 = items / 1728;
+                let stacks: i32 = (items % 1728) / 64;
+                let left: i32 = (items % 1728) % 64;
+
+                return Ok(format!(
+                    "{} item{} break{} down into {} shulker{} plus {} stack{} and {} item{} left over", 
+                    items,
+                    pluralize(items),
+                    third_person_ending(items),
+                    shulkers,
+                    pluralize(shulkers),
+                    stacks,
+                    pluralize(stacks),
+                    left,
+                    pluralize(left)));
+            }
+        }
+        return Err(CommandError::InvalidSyntax(self.usage().to_string()));
+    }
+}
+
+fn pluralize(input: i32) -> &'static str {
+    return if input == 1 { "" } else { "s" };
+}
+
+fn third_person_ending(input: i32) -> &'static str {
+    return if input != 1 { "" } else { "s" };
+}
