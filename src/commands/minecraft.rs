@@ -141,6 +141,48 @@ impl Command for McShulkersCommand {
     }
 }
 
+pub struct McUnshulkerCommand;
+
+impl Command for McUnshulkerCommand {
+    fn name(&self) -> &'static str {
+        "mcunshulker"
+    }
+    fn usage(&self) -> &'static str {
+        "Usage: <number of shulkers>"
+    }
+    fn about(&self) -> &'static str {
+        "Converts a given amount of Minecraft shulker (optionally with decimalss) to number of items."
+    }
+    fn execute(&self, config: Arc<RwLock<Config>>, role: &Role, input: String) -> Result<String, CommandError> {
+        if !check_permission(&config.read().unwrap(), "cmd.mcunshulker".to_string(), role) {
+            return Err(CommandError::NoPerms);
+        }
+ 
+        // Get all the numbers in the message
+        let shulkers = input.chars().filter(|c| c.is_digit(10) || c == &'.').collect::<String>();
+        if !shulkers.is_empty() {
+            if let Some(s) = shulkers.parse::<f32>().ok() {
+                if !s.is_finite() {
+                    // If user inputs ridiculously high number
+                    return Err(CommandError::BadUsage("I dunno lol".to_string()));
+                }
+
+                let items: f32 = s * 1728.0;
+
+                return Ok(format!(
+                    "{} shulker{} break{} down into {:.0} item{}", 
+                    shulkers,
+                    if s == 1.0 {""} else {"s"},
+                    if s != 1.0 {""} else {"s"},
+                    items,
+                    if items == 1.0 { "" } else { "s" }));
+            }
+        }
+        return Err(CommandError::InvalidSyntax(self.usage().to_string()));
+    }
+}
+
+
 fn pluralize(input: i32) -> &'static str {
     return if input == 1 { "" } else { "s" };
 }

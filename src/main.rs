@@ -21,7 +21,7 @@ use config::Config;
 
 mod commands;
 use commands::{Command, CommandError};
-use commands::minecraft::{McItemsCommand, McStacksCommand, McShulkersCommand};
+use commands::minecraft::{McItemsCommand, McStacksCommand, McShulkersCommand, McUnshulkerCommand};
 use commands::temperature::TemperatureCommand;
 use commands::timezone::TimezoneCommand;
 use commands::admin::ReloadCommand;
@@ -60,6 +60,7 @@ impl Handler {
         Self::register_command(&mut handler, Box::new(McItemsCommand));
         Self::register_command(&mut handler, Box::new(McStacksCommand));
         Self::register_command(&mut handler, Box::new(McShulkersCommand));
+        Self::register_command(&mut handler, Box::new(McUnshulkerCommand));
         Self::register_command(&mut handler, Box::new(TemperatureCommand));
         Self::register_command(&mut handler, Box::new(TimezoneCommand));
         Self::register_command(&mut handler, Box::new(ReloadCommand));
