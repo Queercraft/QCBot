@@ -112,7 +112,7 @@ impl Command for McShulkersCommand {
         "Converts a given amount of Minecraft items to how many shulkers, stacks. and remaining items they make up."
     }
     fn execute(&self, config: Arc<RwLock<Config>>, role: &Role, input: String) -> Result<String, CommandError> {
-        if !check_permission(&config.read().unwrap(), "cmd.mcstacks".to_string(), role) {
+        if !check_permission(&config.read().unwrap(), "cmd.mcshulkers".to_string(), role) {
             return Err(CommandError::NoPerms);
         }
  
