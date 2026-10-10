@@ -86,7 +86,7 @@ impl EventHandler for Handler {
                 if let Some(member) = &msg.member {
                     for memberrole in &member.roles {
                         if let Some((name, _role)) = self.config.read().unwrap().roles.iter().find(|(_name, role)|
-                        &role.id == memberrole.as_u64()) {
+                        role.id == memberrole.get()) {
                                 r = name.to_string();
                                 break;
                         }
